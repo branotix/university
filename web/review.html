@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rate your call — Varsity Network</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card" style="text-align:center">
+    <div class="seal" style="margin:0 auto"><span class="seal-mark">VN</span></div>
+    <h1 id="review-title">কল কেমন হলো?</h1>
+    <p class="auth-sub" id="review-sub">রেটিং ও রিভিউ দাও, টিচারের কাছে টাকা পৌঁছাতে সাহায্য করো।</p>
+
+    <div class="star-input" id="star-input" style="justify-content:center; margin-bottom:18px">
+      <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+    </div>
+
+    <div class="field">
+      <textarea id="comment" rows="3" placeholder="কিছু লিখো (ঐচ্ছিক)..."></textarea>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="submit-review-btn">রিভিউ জমা দাও</button>
+    <button class="btn btn-secondary btn-block" style="margin-top:10px" id="skip-btn">এখন না, ড্যাশবোর্ডে যাও</button>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script>
+  Auth.requireLogin();
+  const qs = new URLSearchParams(window.location.search);
+  const sessionId = parseInt(qs.get("session_id"));
+  const teacherId = parseInt(qs.get("teacher_id"));
+  const teacherName = qs.get("teacher_name") || "টিচার";
+
+  document.getElementById("review-title").textContent = `${teacherName}-কে রেট করো`;
+
+  let selectedRating = 0;
+  const stars = document.querySelectorAll("#star-input span");
+  stars.forEach((star) => {
+    star.onclick = () => {
+      selectedRating = parseInt(star.dataset.val);
+      stars.forEach((s) => s.classList.toggle("filled", parseInt(s.dataset.val) <= selectedRating));
+    };
+  });
+
+  document.getElementById("submit-review-btn").onclick = async () => {
+    if (!selectedRating) {
+      showToast("অন্তত ১টা স্টার দাও।", "error");
+      return;
+    }
+    try {
+      await apiRequest("/api/reviews/submit", {
+        method: "POST",
+        auth: true,
+        body: {
+          session_id: sessionId,
+          teacher_id: teacherId,
+          rating: selectedRating,
+          comment: document.getElementById("comment").value,
+        },
+      });
+      showToast("ধন্যবাদ! রিভিউ জমা হয়েছে।", "success");
+      setTimeout(() => (window.location.href = "/feed.html"), 1200);
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  };
+
+  document.getElementById("skip-btn").onclick = () => (window.location.href = "/feed.html");
+</script>
+</body>
+</html>

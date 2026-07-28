@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — KYC Review — Varsity Network</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <div class="brand"><div class="seal"><span class="seal-mark">VN</span></div> Admin Panel</div>
+    <div class="nav-links"><button id="logout-btn" class="btn btn-sm btn-danger">লগআউট</button></div>
+  </div>
+
+  <main class="container">
+    <div class="eyebrow">Admin</div>
+    <h1 style="margin:0 0 20px">KYC ভেরিফিকেশন — পেন্ডিং টিচাররা</h1>
+    <div id="pending-list"><div class="empty-state">লোড হচ্ছে...</div></div>
+
+    <div class="divider"></div>
+
+    <h1 style="margin:0 0 20px">উইথড্র রিকোয়েস্ট</h1>
+    <div id="withdrawal-list"><div class="empty-state">লোড হচ্ছে...</div></div>
+  </main>
+</div>
+
+<script src="/js/api.js"></script>
+<script>
+  Auth.requireLogin();
+  document.getElementById("logout-btn").onclick = () => Auth.logout();
+
+  async function loadPending() {
+    const container = document.getElementById("pending-list");
+    try {
+      const res = await apiRequest("/api/admin/pending-teachers", { auth: true });
+      const list = res.data || [];
+      if (list.length === 0) {
+        container.innerHTML = `<div class="empty-state">কোনো পেন্ডিং KYC নেই। সব ক্লিয়ার! ✅</div>`;
+        return;
+      }
+      container.innerHTML = list.map(renderCard).join("");
+      container.querySelectorAll(".approve-btn").forEach((b) => (b.onclick = () => decide(b.dataset.id, "approved")));
+      container.querySelectorAll(".reject-btn").forEach((b) => (b.onclick = () => decide(b.dataset.id, "rejected")));
+    } catch (err) {
+      if (err.message.includes("403") || err.message.toLowerCase().includes("forbidden")) {
+        container.innerHTML = `<div class="empty-state">তোমার অ্যাকাউন্ট admin নয় — এই পেজ শুধু admin-দের জন্য।</div>`;
+      } else {
+        showToast(err.message, "error");
+      }
+    }
+  }
+
+  function renderCard(t) {
+    return `
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px">
+          <div>
+            <div style="font-family:'Sora'; font-weight:700; font-size:16px">${t.name} <span class="muted" style="font-weight:400; font-size:13px">#${t.user_id}</span></div>
+            <div class="muted" style="font-size:13px">${t.email} · ${t.phone}</div>
+            <div class="muted" style="font-size:13px; margin-top:4px">${t.university || "—"} · ${t.expertise || "—"}</div>
+          </div>
+          <div>
+            ${t.student_card_url ? `<a href="${t.student_card_url}" target="_blank" class="btn btn-secondary btn-sm">ID কার্ড দেখো ↗</a>` : '<span class="muted">কার্ড দেওয়া হয়নি</span>'}
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:14px">
+          <button class="btn btn-danger btn-sm reject-btn" data-id="${t.user_id}">রিজেক্ট</button>
+          <button class="btn btn-teal btn-sm approve-btn" data-id="${t.user_id}">অ্যাপ্রুভ করো</button>
+        </div>
+      </div>`;
+  }
+
+  async function decide(userId, status) {
+    try {
+      await apiRequest("/api/admin/approve-kyc", { method: "POST", auth: true, body: { teacher_user_id: parseInt(userId), status } });
+      showToast(status === "approved" ? "টিচার অ্যাপ্রুভ হয়েছে।" : "টিচার রিজেক্ট করা হয়েছে।", "success");
+      loadPending();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  loadPending();
+
+  // ---------- Withdrawal requests ----------
+  async function loadWithdrawals() {
+    const container = document.getElementById("withdrawal-list");
+    try {
+      const res = await apiRequest("/api/admin/withdrawals/pending", { auth: true });
+      const list = res.data || [];
+      if (list.length === 0) {
+        container.innerHTML = `<div class="empty-state">কোনো পেন্ডিং উইথড্র রিকোয়েস্ট নেই।</div>`;
+        return;
+      }
+      container.innerHTML = list.map(renderWithdrawalCard).join("");
+      container.querySelectorAll(".wd-paid-btn").forEach((b) => (b.onclick = () => processWithdrawal(b.dataset.id, "paid")));
+      container.querySelectorAll(".wd-reject-btn").forEach((b) => (b.onclick = () => processWithdrawal(b.dataset.id, "rejected")));
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  function renderWithdrawalCard(wd) {
+    return `
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px">
+          <div>
+            <div style="font-family:'Sora'; font-weight:700; font-size:16px">${wd.teacher_name} <span class="muted" style="font-weight:400; font-size:13px">#${wd.teacher_id}</span></div>
+            <div class="muted" style="font-size:13px">৳${wd.amount.toFixed(0)} → ${wd.payment_number} (${wd.method})</div>
+          </div>
+        </div>
+        <p class="muted" style="font-size:12.5px; margin:10px 0">এই টাকাটা টিচারের একাউন্ট থেকে ইতিমধ্যে কেটে রাখা হয়েছে। "পেইড করেছি" চাপার আগে সত্যিই bKash/Nagad দিয়ে টাকা পাঠিয়ে দাও।</p>
+        <div style="display:flex; gap:10px; margin-top:8px">
+          <button class="btn btn-danger btn-sm wd-reject-btn" data-id="${wd.id}">রিজেক্ট (টাকা ফেরত)</button>
+          <button class="btn btn-teal btn-sm wd-paid-btn" data-id="${wd.id}">পেইড করেছি ✅</button>
+        </div>
+      </div>`;
+  }
+
+  async function processWithdrawal(id, status) {
+    try {
+      await apiRequest("/api/admin/withdrawals/process", { method: "POST", auth: true, body: { withdrawal_id: parseInt(id), status } });
+      showToast(status === "paid" ? "উইথড্র পেইড হিসেবে মার্ক করা হয়েছে।" : "উইথড্র রিজেক্ট করা হয়েছে, টাকা টিচারকে ফেরত দেওয়া হয়েছে।", "success");
+      loadWithdrawals();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  loadWithdrawals();
+</script>
+</body>
+</html>

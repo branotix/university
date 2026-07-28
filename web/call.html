@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call — Varsity Network</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="call-shell">
+  <div class="call-stage">
+    <video id="remote-video" class="remote-video" autoplay playsinline></video>
+
+    <div class="call-status">
+      <div class="name" id="call-status-name">সহপাঠী</div>
+      <div class="timer" id="call-timer">00:00</div>
+    </div>
+
+    <p class="call-waiting" id="call-waiting">সংযোগ স্থাপন হচ্ছে...</p>
+
+    <div class="local-video-wrap">
+      <video id="local-video" class="local-video" autoplay playsinline muted></video>
+    </div>
+  </div>
+
+  <div class="call-controls">
+    <button class="ctrl-btn" id="mic-btn" title="Mute/Unmute">🎤</button>
+    <button class="ctrl-btn" id="cam-btn" title="Camera On/Off">📹</button>
+    <button class="ctrl-btn end" id="end-btn" title="End Call">📞</button>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/call.js"></script>
+</body>
+</html>

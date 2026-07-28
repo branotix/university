@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ফিড — Varsity Network</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-nav"></div>
+
+  <main class="container">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px">
+      <div>
+        <div class="eyebrow">Feed</div>
+        <h1 style="margin:0 0 6px">সবার প্রোফাইল দেখো</h1>
+        <p class="muted" style="margin-bottom:20px">সিনিয়র বা সহপাঠী — যার সাথে চাও, প্রোফাইলে গিয়ে মেসেজ বা কল করো।</p>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <span id="wallet-chip" class="chip">৳ 0</span>
+        <button id="topup-btn" class="btn btn-sm btn-secondary">টপ-আপ</button>
+      </div>
+    </div>
+
+    <div class="stat-grid" id="platform-stats"></div>
+
+    <div class="chip-row" id="role-filters">
+      <span class="chip active" data-role="">সবাই</span>
+      <span class="chip" data-role="teacher">সিনিয়র/টিচার</span>
+      <span class="chip" data-role="student">স্টুডেন্ট</span>
+    </div>
+    <div class="chip-row" id="university-filters">
+      <span class="chip active" data-uni="">সব ভার্সিটি</span>
+      <span class="chip" data-uni="BUET">BUET</span>
+      <span class="chip" data-uni="DU">DU</span>
+      <span class="chip" data-uni="DUET">DUET</span>
+      <span class="chip" data-uni="RUET">RUET</span>
+      <span class="chip" data-uni="CUET">CUET</span>
+      <span class="chip" data-uni="KUET">KUET</span>
+    </div>
+
+    <div id="feed-grid" class="teacher-grid">
+      <div class="empty-state">লোড হচ্ছে...</div>
+    </div>
+  </main>
+</div>
+
+<!-- Top-up modal -->
+<div id="topup-modal" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <h3 style="margin-top:0">ওয়ালেট টপ-আপ (bKash)</h3>
+    <div class="field">
+      <label>পরিমাণ (৳)</label>
+      <input type="number" id="topup-amount" min="10" placeholder="যেমন: 100">
+    </div>
+    <p class="muted" style="font-size:12.5px">bKash sandbox দিয়ে টেস্ট পেমেন্ট হবে — কোনো টাকা কাটবে না।</p>
+    <div style="display:flex; gap:10px; margin-top:12px">
+      <button class="btn btn-secondary btn-block" onclick="document.getElementById('topup-modal').style.display='none'">বাতিল</button>
+      <button class="btn btn-primary btn-block" id="confirm-topup-btn">bKash দিয়ে পে করো</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/presence.js"></script>
+<script>renderNav("feed");</script>
+<script src="/js/feed.js"></script>
+</body>
+</html>

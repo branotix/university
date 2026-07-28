@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varsity Network — সিনিয়রদের সাথে কথা বলুন</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="seal"><span class="seal-mark">VN</span></div>
+      <h1 id="auth-title">Varsity Network</h1>
+      <p class="auth-sub" id="auth-sub">BUET, DU, DUET সহ দেশের সেরা ভার্সিটির সিনিয়রদের সাথে ১:১ কলে কথা বলুন।</p>
+    </div>
+
+    <div class="tab-switch" id="tab-switch">
+      <button id="tab-login" class="active">লগইন</button>
+      <button id="tab-register">রেজিস্ট্রেশন</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="login-form">
+      <div class="field">
+        <label>ইমেইল</label>
+        <input type="email" id="login-email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>পাসওয়ার্ড</label>
+        <input type="password" id="login-password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">লগইন করুন</button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="register-form" style="display:none">
+      <div class="role-toggle">
+        <label><input type="radio" name="role" value="student" checked><span>স্টুডেন্ট</span></label>
+        <label><input type="radio" name="role" value="teacher"><span>সিনিয়র / টিচার</span></label>
+      </div>
+
+      <div class="field"><label>পূর্ণ নাম</label><input type="text" id="reg-name" required></div>
+      <div class="field-row">
+        <div class="field"><label>ইমেইল</label><input type="email" id="reg-email" required></div>
+        <div class="field"><label>ফোন নম্বর</label><input type="tel" id="reg-phone" required placeholder="017XXXXXXXX"></div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>জেন্ডার</label>
+          <select id="reg-gender" required>
+            <option value="">নির্বাচন করুন</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>পাসওয়ার্ড</label><input type="password" id="reg-password" required minlength="6"></div>
+      </div>
+
+      <div id="teacher-fields" style="display:none">
+        <div class="field">
+          <label>বিশ্ববিদ্যালয়</label>
+          <input type="text" id="reg-university" placeholder="যেমন: BUET, DU, DUET">
+        </div>
+        <div class="field">
+          <label>এক্সপার্টাইজ / সাবজেক্ট</label>
+          <input type="text" id="reg-expertise" placeholder="যেমন: Physics, Admission Guidance">
+        </div>
+        <div class="field">
+          <label>স্টুডেন্ট আইডি কার্ড (ছবি আপলোড করো)</label>
+          <input type="file" id="reg-card-file" accept="image/png,image/jpeg,image/webp">
+          <div class="muted" style="font-size:12px; margin-top:4px" id="card-upload-status">এডমিন KYC ভেরিফাই করার পরে আপনার প্রোফাইল লিস্টে দেখা যাবে।</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>ভেরিফিকেশন: <span id="captcha-question">লোড হচ্ছে...</span></label>
+        <input type="number" id="captcha-answer" placeholder="উত্তর লেখো" required>
+      </div>
+
+      <label style="display:flex; gap:8px; align-items:flex-start; font-size:12.5px; color:var(--text-muted); margin-bottom:14px; cursor:pointer">
+        <input type="checkbox" id="agree-terms" style="margin-top:3px" required>
+        <span>আমি <a href="#" id="open-terms-link">শর্তাবলী</a> পড়েছি এবং মেনে নিচ্ছি।</span>
+      </label>
+
+      <button type="submit" class="btn btn-primary btn-block" id="register-submit-btn">অ্যাকাউন্ট তৈরি করুন</button>
+    </form>
+
+    <!-- EMAIL VERIFICATION STEP -->
+    <form id="verify-form" style="display:none">
+      <p class="auth-sub" style="margin-top:0">
+        <strong id="verify-email-label"></strong>-এ পাঠানো ৬ সংখ্যার কোডটি বসাও।
+      </p>
+      <div class="field">
+        <label>ভেরিফিকেশন কোড</label>
+        <input type="text" id="verify-code" maxlength="6" inputmode="numeric" placeholder="123456" style="letter-spacing:6px; font-size:20px; text-align:center">
+      </div>
+      <div id="dev-code-hint" class="muted" style="font-size:12.5px; margin-bottom:10px; display:none"></div>
+      <button type="submit" class="btn btn-primary btn-block">ভেরিফাই করো</button>
+
+      <div class="field" style="margin-top:14px">
+        <label>ভেরিফিকেশন: <span id="resend-captcha-question">লোড হচ্ছে...</span></label>
+        <input type="number" id="resend-captcha-answer" placeholder="উত্তর লেখো">
+      </div>
+      <button type="button" class="btn btn-secondary btn-block" id="resend-code-btn">কোড আবার পাঠাও</button>
+    </form>
+  </div>
+</div>
+
+<!-- Terms & Conditions modal -->
+<div id="terms-modal" class="modal-overlay" style="display:none">
+  <div class="modal" style="max-width:520px; max-height:80vh; overflow-y:auto">
+    <h3 style="margin-top:0">শর্তাবলী (Terms &amp; Conditions)</h3>
+    <p class="muted" style="font-size:13px">Varsity Network একটি শিক্ষামূলক প্ল্যাটফর্ম। ব্যবহারের আগে নিচের শর্তগুলো মনোযোগ দিয়ে পড়ো:</p>
+    <ol style="font-size:13.5px; line-height:1.7; padding-left:20px; color:var(--text)">
+      <li>এই প্ল্যাটফর্মটি সম্পূর্ণভাবে <strong>শিক্ষামূলক উদ্দেশ্যে</strong> তৈরি — শুধুমাত্র পড়াশোনা, ক্যারিয়ার গাইডেন্স ও মেন্টরশিপের জন্য ব্যবহার করতে হবে।</li>
+      <li>সকল সিনিয়র/টিচারদের সাথে <strong>ভদ্র ও সম্মানজনক</strong> আচরণ করতে হবে।</li>
+      <li><strong>কোনো মেয়ে শিক্ষার্থী বা টিচারের প্রতি যেকোনো ধরনের যৌন হয়রানি, অশালীন মন্তব্য বা অস্বস্তিকর আচরণ সম্পূর্ণভাবে নিষিদ্ধ।</strong> এমন ঘটনা প্রমাণিত হলে অ্যাকাউন্ট সাথে সাথে স্থায়ীভাবে ব্যান করা হবে এবং প্রয়োজনে <strong>আইনি ব্যবস্থা</strong> নেওয়া হবে।</li>
+      <li>মিথ্যা পরিচয়, ভুয়া তথ্য বা জাল আইডি কার্ড দিয়ে অ্যাকাউন্ট খোলা নিষিদ্ধ — ধরা পড়লে স্থায়ীভাবে ব্যান করা হবে।</li>
+      <li>কল বা মেসেজের মাধ্যমে কাউকে হুমকি, গালিগালাজ, বা মানসিকভাবে হয়রানি করা সম্পূর্ণ নিষিদ্ধ।</li>
+      <li>টিচারদের KYC তথ্য (স্টুডেন্ট আইডি কার্ড) শুধুমাত্র পরিচয় যাচাইয়ের জন্য ব্যবহার করা হবে, অন্য কোনো উদ্দেশ্যে শেয়ার করা হবে না।</li>
+      <li>এই নিয়মগুলো লঙ্ঘন করলে কর্তৃপক্ষ বিনা নোটিশে অ্যাকাউন্ট স্থায়ীভাবে বন্ধ করে দেওয়ার অধিকার রাখে, এবং গুরুতর ক্ষেত্রে (যেমন যৌন হয়রানি) সংশ্লিষ্ট আইনি কর্তৃপক্ষের কাছে অভিযোগ জানানো হবে।</li>
+    </ol>
+    <button class="btn btn-primary btn-block" onclick="document.getElementById('terms-modal').style.display='none'">বুঝেছি, বন্ধ করো</button>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script>
+  const tabLogin = document.getElementById("tab-login");
+  const tabRegister = document.getElementById("tab-register");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const verifyForm = document.getElementById("verify-form");
+  const tabSwitch = document.getElementById("tab-switch");
+  let pendingVerifyEmail = "";
+  let regCaptchaId = "";
+  let resendCaptchaId = "";
+
+  async function loadRegCaptcha() {
+    try {
+      const res = await apiRequest("/api/captcha");
+      regCaptchaId = res.captcha_id;
+      document.getElementById("captcha-question").textContent = res.question;
+      document.getElementById("captcha-answer").value = "";
+    } catch (err) {
+      document.getElementById("captcha-question").textContent = "লোড ব্যর্থ, রিফ্রেশ করো";
+    }
+  }
+  async function loadResendCaptcha() {
+    try {
+      const res = await apiRequest("/api/captcha");
+      resendCaptchaId = res.captcha_id;
+      document.getElementById("resend-captcha-question").textContent = res.question;
+      document.getElementById("resend-captcha-answer").value = "";
+    } catch (err) {
+      document.getElementById("resend-captcha-question").textContent = "লোড ব্যর্থ, রিফ্রেশ করো";
+    }
+  }
+
+  document.getElementById("open-terms-link").onclick = (e) => {
+    e.preventDefault();
+    document.getElementById("terms-modal").style.display = "flex";
+  };
+
+  tabLogin.onclick = () => showStep("login");
+  tabRegister.onclick = () => showStep("register");
+
+  function showStep(step) {
+    tabSwitch.style.display = step === "verify" ? "none" : "flex";
+    tabLogin.classList.toggle("active", step === "login");
+    tabRegister.classList.toggle("active", step === "register");
+    loginForm.style.display = step === "login" ? "block" : "none";
+    registerForm.style.display = step === "register" ? "block" : "none";
+    verifyForm.style.display = step === "verify" ? "block" : "none";
+  }
+
+  document.querySelectorAll('input[name="role"]').forEach(r => {
+    r.onchange = () => {
+      document.getElementById("teacher-fields").style.display = r.value === "teacher" && r.checked ? "block" : "none";
+    };
+  });
+
+  loginForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    try {
+      const res = await apiRequest("/api/login", { method: "POST", body: { email, password } });
+      Auth.setSession(res.token, res.role, "");
+      const me = await apiRequest("/api/me", { auth: true });
+      Auth.setSession(res.token, res.role, me.data.id);
+      showToast("লগইন সফল হয়েছে!", "success");
+      window.location.href = "/feed.html";
+    } catch (err) {
+      // If the backend says we need email verification, jump straight into that flow.
+      if (err.message.toLowerCase().includes("verify")) {
+        pendingVerifyEmail = email;
+        document.getElementById("verify-email-label").textContent = email;
+        showStep("verify");
+        loadResendCaptcha();
+        showToast("প্রথমে ইমেইল ভেরিফাই করো।", "error");
+      } else {
+        showToast(err.message, "error");
+      }
+    }
+  };
+
+  registerForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const role = document.querySelector('input[name="role"]:checked').value;
+    const submitBtn = document.getElementById("register-submit-btn");
+
+    if (!document.getElementById("agree-terms").checked) {
+      showToast("রেজিস্ট্রেশনের জন্য শর্তাবলী মেনে নিতে হবে।", "error");
+      return;
+    }
+    const captchaAnswer = parseInt(document.getElementById("captcha-answer").value);
+    if (isNaN(captchaAnswer)) {
+      showToast("ভেরিফিকেশনের অংকের উত্তর দাও।", "error");
+      return;
+    }
+
+    submitBtn.disabled = true;
+
+    try {
+      let studentCardUrl = "";
+      if (role === "teacher") {
+        const fileInput = document.getElementById("reg-card-file");
+        if (!fileInput.files[0]) {
+          showToast("স্টুডেন্ট আইডি কার্ডের ছবি আপলোড করো।", "error");
+          submitBtn.disabled = false;
+          return;
+        }
+        document.getElementById("card-upload-status").textContent = "আপলোড হচ্ছে...";
+        studentCardUrl = await uploadImage(fileInput.files[0], "kyc");
+        document.getElementById("card-upload-status").textContent = "আপলোড সম্পন্ন ✅";
+      }
+
+      const body = {
+        name: document.getElementById("reg-name").value,
+        email: document.getElementById("reg-email").value,
+        phone: document.getElementById("reg-phone").value,
+        gender: document.getElementById("reg-gender").value,
+        password: document.getElementById("reg-password").value,
+        role,
+        captcha_id: regCaptchaId,
+        captcha_answer: captchaAnswer,
+      };
+      if (role === "teacher") {
+        body.university = document.getElementById("reg-university").value;
+        body.expertise = document.getElementById("reg-expertise").value;
+        body.student_card_url = studentCardUrl;
+      }
+
+      const res = await apiRequest("/api/register", { method: "POST", body });
+      showToast("অ্যাকাউন্ট তৈরি হয়েছে! ইমেইল ভেরিফাই করো।", "success");
+      pendingVerifyEmail = body.email;
+      document.getElementById("verify-email-label").textContent = body.email;
+      const hint = document.getElementById("dev-code-hint");
+      if (res.dev_code) {
+        hint.style.display = "block";
+        hint.textContent = `(SMTP সেটআপ করা নেই — টেস্টিং কোড: ${res.dev_code})`;
+      } else {
+        hint.style.display = "none";
+      }
+      loadResendCaptcha();
+      showStep("verify");
+    } catch (err) {
+      showToast(err.message, "error");
+      loadRegCaptcha(); // captcha is one-time use — always refresh after a failed attempt too
+    } finally {
+      submitBtn.disabled = false;
+    }
+  };
+
+  verifyForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const code = document.getElementById("verify-code").value.trim();
+    try {
+      await apiRequest("/api/verify-email", { method: "POST", body: { email: pendingVerifyEmail, code } });
+      showToast("ইমেইল ভেরিফাই হয়েছে! এখন লগইন করো।", "success");
+      showStep("login");
+      document.getElementById("login-email").value = pendingVerifyEmail;
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  };
+
+  let resendCooldownInterval = null;
+  function startResendCooldown(seconds) {
+    const btn = document.getElementById("resend-code-btn");
+    btn.disabled = true;
+    let remaining = seconds;
+    btn.textContent = `আবার পাঠানো যাবে ${remaining}s পরে`;
+    clearInterval(resendCooldownInterval);
+    resendCooldownInterval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(resendCooldownInterval);
+        btn.disabled = false;
+        btn.textContent = "কোড আবার পাঠাও";
+      } else {
+        btn.textContent = `আবার পাঠানো যাবে ${remaining}s পরে`;
+      }
+    }, 1000);
+  }
+
+  document.getElementById("resend-code-btn").onclick = async () => {
+    const captchaAnswer = parseInt(document.getElementById("resend-captcha-answer").value);
+    if (isNaN(captchaAnswer)) {
+      showToast("ভেরিফিকেশনের অংকের উত্তর দাও।", "error");
+      return;
+    }
+    try {
+      const res = await apiRequest("/api/resend-verification", {
+        method: "POST",
+        body: { email: pendingVerifyEmail, captcha_id: resendCaptchaId, captcha_answer: captchaAnswer },
+      });
+      showToast("নতুন কোড পাঠানো হয়েছে।", "success");
+      const hint = document.getElementById("dev-code-hint");
+      if (res.dev_code) {
+        hint.style.display = "block";
+        hint.textContent = `(SMTP সেটআপ করা নেই — টেস্টিং কোড: ${res.dev_code})`;
+      }
+      startResendCooldown(60);
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      loadResendCaptcha();
+    }
+  };
+
+  // If already logged in, skip straight to the feed
+  if (Auth.getToken()) {
+    window.location.href = "/feed.html";
+  }
+
+  loadRegCaptcha();
+</script>
+</body>
+</html>

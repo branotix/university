@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>সেটিংস — Varsity Network</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-nav"></div>
+
+  <main class="container" style="max-width:640px">
+    <div class="eyebrow">Settings</div>
+    <h1 style="margin:0 0 20px">সেটিংস</h1>
+
+    <div id="kyc-banner"></div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="section-title"><h2>অ্যাকাউন্ট তথ্য</h2></div>
+      <div class="info-row" style="margin-bottom:6px"><strong style="color:var(--text)">নাম:</strong>&nbsp;<span id="s-name"></span></div>
+      <div class="info-row" style="margin-bottom:6px"><strong style="color:var(--text)">ইমেইল:</strong>&nbsp;<span id="s-email"></span></div>
+      <div class="info-row" style="margin-bottom:6px"><strong style="color:var(--text)">ফোন:</strong>&nbsp;<span id="s-phone"></span></div>
+      <div class="info-row"><strong style="color:var(--text)">রোল:</strong>&nbsp;<span id="s-role"></span></div>
+    </div>
+
+    <div id="teacher-settings"></div>
+
+    <div class="card">
+      <div class="section-title"><h2>লগআউট</h2></div>
+      <p class="muted" style="margin-top:0">এই ডিভাইস থেকে লগআউট করো।</p>
+      <button class="btn btn-danger" id="logout-btn">লগআউট করো</button>
+    </div>
+  </main>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/presence.js"></script>
+<script>renderNav("settings");</script>
+<script src="/js/settings.js"></script>
+</body>
+</html>
